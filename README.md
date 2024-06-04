@@ -30,6 +30,17 @@
    [https://ia802202.us.archive.org/1/items/nycTaxiTripData2013/](https://ia802202.us.archive.org/1/items/nycTaxiTripData2013/)
 
 
+NB: The Docker image will create a user with a `uid` of 999.  In order that the data folder
+is readable, I typically just change the "all" permissions using `chmod a+...`.  If you have 
+issues after the fact, try:
+
+```bash
+DATA=/data # Or wherever you've defined your folder
+chmod a+r -R "$DATA" # make everything readable by everybody
+find "$DATA" -type d -exec chmod a+x "{}" + # make directories readable ("executable" [sic])
+chmod a+rwx "$DATA" # So container can create the `output` folder.
+```
+
 # Dockerfile
 
 Builds two images, `ow-drill` and `ow-drill-1`.  The "`1`" version builds on the base version
