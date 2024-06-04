@@ -35,7 +35,7 @@ is readable, I typically just change the "all" permissions using `chmod a+...`. 
 issues after the fact, try:
 
 ```bash
-DATA=/data # Or wherever you've defined your folder
+DATA=/data # Or wherever you've defined your data folder
 chmod a+r -R "$DATA" # make everything readable by everybody
 find "$DATA" -type d -exec chmod a+x "{}" + # make directories readable ("executable" [sic])
 chmod a+rwx "$DATA" # So container can create the `output` folder.
