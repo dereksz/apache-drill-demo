@@ -1,4 +1,4 @@
-.PHONEY: build run stop start create remove exec up attach
+.PHONEY: build run stop start create remove exec up attach batch rm
 
 CONTAINER_NAME := ow-drill-1
 
@@ -15,7 +15,10 @@ create: build remove
 		-v /media/12Tb-mirror/Shared/BigData/Data/ia802501.us.archive.org/1/items/nycTaxiTripData2013:/data \
 		ow-drill		
 
-run:
+rm:
+	sudo rm -rf /media/12Tb-mirror/Shared/BigData/Data/ia802501.us.archive.org/1/items/nycTaxiTripData2013/data/output
+
+run: create rm
 	docker start -ai $(CONTAINER_NAME)
 
 stop:
