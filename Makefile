@@ -16,7 +16,11 @@ $(NY_TAXI_DATA)/trip/%: $(NY_TAXI_DATA)/trip_%.7z
 		7z e -so "$<" "$$F" | gzip -c > "$@/$$F.gz" & \
 	done; \
 	wait
+	chmod a+r "$@/*"
+	chmod a+xr "$@" "$(NY_TAXI_DATA)/trip/"
+	chmod a+rwx "$(NY_TAXI_DATA)"
 	du -sch "$@/*.gz"
+
 
 data: $(NY_TAXI_DATA)/data # $(NY_TAXI_DATA)/fare - we don't currently use the fare data
 	# op-op
