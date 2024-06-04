@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  drill:
+    # image: apache/drill:latest
+    build: .
+    container_name: ow-drill-1
+    # Resources
+    deploy:
+      resources:
+        limits:
+          cpus: "12"
+          memory: 40G
+        # reservation:
+        #   cpus: 8
+        #   memory: 20G
+    # Data
+    volumes:
+      - /media/12Tb-mirror/Shared/BigData/Data/ia802501.us.archive.org/1/items/nycTaxiTripData2013:/data
+    ports:
+      - 8047:8047 # Web interface
+      - 31010:31010 # JDBC/ODBC interface
+    entrypoint:
+      - /opt/drill/bin/drill-embedded # Long running drill-bit
+
+    # Make interactive
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t    
