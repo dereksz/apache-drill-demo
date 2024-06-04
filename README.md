@@ -75,11 +75,11 @@ This file is really about overriding two things.
             "type" : "file",
             "connection" : "file:///",
             "workspaces" : {
-            "default": {
-                "location": "/data", # <== New location
-                "writable": true, # <== Make default writeable
-                "defaultInputFormat": null
-            },  
+                "default": {
+                    "location": "/data", # <== New location
+                    "writable": true, # <== Make default writeable
+                    "defaultInputFormat": null
+                } 
             }  
         } 
     }    
