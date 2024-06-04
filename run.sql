@@ -1,12 +1,8 @@
 use dfs;
+-- Make sure blank strings become NULLs,
+-- or the `cast`s will fail in the `create table` below.
 alter system set `drill.exec.functions.cast_empty_string_to_null` = true;
-ALTER SESSION SET `store.format` = 'parquet';
-ALTER SESSION SET `store.parquet.compression` = 'zstd';
--- ALTER SESSION SET `store.parquet.block-size` = 134217728; -- 128M - to avoid out of memory
-ALTER SESSION SET `store.parquet.block-size` = 536870912; -- 512M - testing
-
-select * from `data/csv.gz` limit 10;
-create table `data/output`
+create table `output`
 as
     select 
         medallion,
@@ -23,4 +19,4 @@ as
         cast(pickup_latitude as double) pickup_latitude,
         cast(dropoff_longitude as double) as dropoff_longitude,
         cast(dropoff_latitude as double) as dropoff_latitude
-    from `data/csv.gz` as t;
+    from `trip/data` as t;

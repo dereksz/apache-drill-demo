@@ -1,22 +1,44 @@
-.PHONEY: build run stop start create remove exec up attach batch rm
+.PHONEY: build run stop start create remove exec up attach batch rm data
 
+# NY_TAXI_DATA := /media/12Tb-mirror/Shared/BigData/Data/ia802501.us.archive.org/1/items/nycTaxiTripData2013
+NY_TAXI_DATA := /data/ny-taxi
+NT_TAXI_HTTP=https://ia902202.us.archive.org/28/items/nycTaxiTripData2013
 CONTAINER_NAME := ow-drill-1
 
+# Targets for fetching and de-/re-compressing
+$(NY_TAXI_DATA)/trip_%.7z:
+	curl -o "$@" "$(NT_TAXI_HTTP)/$(@F)" 
+
+$(NY_TAXI_DATA)/trip/%: $(NY_TAXI_DATA)/trip_%.7z
+	mkdir -p "$@"
+	for F in `7z l "$<" | grep -o -E 'trip_[a-z]+_[0-9]+\.csv'`; \
+	do \
+		7z e -so "$<" "$$F" | gzip -c > "$@/$$F.gz" & \
+	done; \
+	wait
+	du -sch "$@/*.gz"
+
+data: $(NY_TAXI_DATA)/data # $(NY_TAXI_DATA)/fare - we don't currently use the fare data
+	# op-op
+
+
 build:
-	docker buildx build -t ow-drill .
+	docker buildx build --tag $(CONTAINER_NAME) --target $(CONTAINER_NAME) .
 
 remove: stop
 	docker container rm -f $(CONTAINER_NAME) > /dev/null
 
 create: build remove
 	docker create --name $(CONTAINER_NAME) -it \
-		-m 40G \
+		--memory=54G \
+		--cpus="12.0" \
+		--cpu-shares=1024 \
 		-p 8047:8047 -p 31010:31010 \
-		-v /media/12Tb-mirror/Shared/BigData/Data/ia802501.us.archive.org/1/items/nycTaxiTripData2013:/data \
-		ow-drill		
+		-v "$(NY_TAXI_DATA)":/data \
+		$(CONTAINER_NAME)
 
 rm:
-	sudo rm -rf /media/12Tb-mirror/Shared/BigData/Data/ia802501.us.archive.org/1/items/nycTaxiTripData2013/data/output
+	[ ! -d "$(NY_TAXI_DATA)/output" ] || sudo rm -rf "$(NY_TAXI_DATA)/output/"
 
 run: create rm
 	docker start -ai $(CONTAINER_NAME)
